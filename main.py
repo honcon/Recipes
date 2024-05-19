@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import messagebox
 from ingredients import Ingredients
 from recipes import Recipes
+from backend import project10_db as db
 
 class App(tk.Tk):
     menu_type = { "recipes": 0, "ingredients": 1 }
@@ -12,6 +13,9 @@ class App(tk.Tk):
 
     def __init__(self):
         super().__init__()
+
+        # Initialize the database
+        db.init_db()
 
         self.geometry("800x600")
         self.resizable(True, True)
