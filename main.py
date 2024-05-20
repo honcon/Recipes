@@ -18,8 +18,9 @@ class App(tk.Tk):
         db.init_db()
 
         self.geometry("800x600")
+        self.minsize(800, 600)
         self.resizable(True, True)
-        self.title("Cooking Recipes")
+        self.title("Συνταγες Μαγειρικης")
         
 
         self.label = tk.Label(self, text=f"Recipes! {self.selected_menu}", font=("Arial", 24), border=1, relief="solid", padx=10, pady=10)
@@ -28,10 +29,10 @@ class App(tk.Tk):
         leftbar = tk.Frame(self, border=1, relief="solid", padx=10, pady=10)
         leftbar.pack(fill="y", side="left", expand=False)
 
-        recipes_button = tk.Button(leftbar, text="Recipes", command=lambda: self.set_menu(self.menu_type["recipes"]))
+        recipes_button = tk.Button(leftbar, text="Συνταγές", width=15, command=lambda: self.set_menu(self.menu_type["recipes"]))
         recipes_button.pack()
 
-        ingredients_button = tk.Button(leftbar, text="Ingredients", command=lambda: self.set_menu(self.menu_type["ingredients"]))
+        ingredients_button = tk.Button(leftbar, text="Υλικά", width=15, command=lambda: self.set_menu(self.menu_type["ingredients"]))
         ingredients_button.pack()
 
         mainframe = tk.Frame(self, border=1, relief="solid", padx=10, pady=10)
@@ -44,7 +45,8 @@ class App(tk.Tk):
         self.ingredients.place(in_=mainframe, x=0, y=0, relwidth=1, relheight=1)
 
         # Define Recipes as the default menu
-        self.recipes.lift()
+        # self.recipes.lift()
+        self.ingredients.lift()
 
     def set_menu(self, menu):
         self.selected_menu = menu
