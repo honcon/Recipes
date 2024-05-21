@@ -25,10 +25,10 @@ class Ingredients(tk.Frame):
         self.heading_label = tk.Label(self.heading, text="Υλικά", font=("Arial", 24))
         self.heading_label.grid(row=0, column=0, sticky="w")
 
-        self.add_ingredient_button = tk.Button(self.heading, text="Προσθήκη Υλικού", command=self.add_ingredient)
+        self.add_ingredient_button = tk.Button(self.heading, text="Προσθήκη", command=self.add_ingredient)
         self.add_ingredient_button.grid(row=0, column=1, sticky="e")
 
-        self.delete_ingredient_button = tk.Button(self.heading, text="Διαγραφη Υλικού", command=self.delete_ingredient)
+        self.delete_ingredient_button = tk.Button(self.heading, text="Διαγραφη", command=self.delete_ingredient)
         self.delete_ingredient_button.grid(row=0, column=3, sticky="e")
         self.delete_ingredient_button.config(state="disabled")
 
