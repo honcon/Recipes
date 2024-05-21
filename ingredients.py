@@ -4,7 +4,6 @@ from tkinter import ttk, simpledialog
 
 class Ingredients(tk.Frame):
     
-    selected_ingredient = None
 
     def load_ingredients(self):
         ingredients = list(db.Ingredient.select())
@@ -18,10 +17,10 @@ class Ingredients(tk.Frame):
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
 
-        self.heading = tk.Frame(self)
+        self.selected_ingredient = tk.IntVar()
 
+        self.heading = tk.Frame(self)
         self.heading.columnconfigure(0, weight=1)
-        self.heading.columnconfigure(1, weight=1)
 
         self.heading_label = tk.Label(self.heading, text="Υλικά", font=("Arial", 24))
         self.heading_label.grid(row=0, column=0, sticky="w")
@@ -29,9 +28,11 @@ class Ingredients(tk.Frame):
         self.add_ingredient_button = tk.Button(self.heading, text="Προσθήκη Υλικού", command=self.add_ingredient)
         self.add_ingredient_button.grid(row=0, column=1, sticky="e")
 
+        self.delete_ingredient_button = tk.Button(self.heading, text="Διαγραφη Υλικού", command=self.delete_ingredient)
+        self.delete_ingredient_button.grid(row=0, column=3, sticky="e")
+        self.delete_ingredient_button.config(state="disabled")
+
         self.heading.pack(fill="x")
-
-
 
         self.ingredients_table = ttk.Treeview(self, columns=("id", "name"), selectmode="browse", show='headings')
         self.ingredients_table["displaycolumns"] = ["name"]
@@ -42,9 +43,16 @@ class Ingredients(tk.Frame):
 
         self.load_ingredients()
 
+
     def select_ingredient(self, event):
-        item = self.ingredients_table.selection()[0]
-        self.selected_ingredient = self.ingredients_table.item(item)["values"][0]
+        try:
+            item = self.ingredients_table.selection()[0]
+            self.selected_ingredient.set(self.ingredients_table.item(item)["values"][0])
+            self.delete_ingredient_button.config(state="normal")
+        except IndexError:
+            self.selected_ingredient.set(0)
+            self.delete_ingredient_button.config(state="disabled")
+
 
     def add_ingredient(self):
         new_ingredient = simpledialog.askstring("Προσθήκη Υλικού", "Όνομα Υλικού", parent=self)
@@ -52,4 +60,10 @@ class Ingredients(tk.Frame):
         # new ingredient is not None or empty string
         if new_ingredient:
             db.Ingredient.create(name=new_ingredient)
+            self.load_ingredients()
+
+
+    def delete_ingredient(self):
+        if self.selected_ingredient:
+            db.Ingredient.delete().where(db.Ingredient.id == self.selected_ingredient.get()).execute()
             self.load_ingredients()
