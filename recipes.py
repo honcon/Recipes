@@ -93,7 +93,7 @@ class Recipes(tk.Frame):
 
         add_recipe.minsize(700, 400)
         add_recipe.resizable(True, True)
-        print(add_recipe.winfo_width())
+
         x = self.parent.winfo_x() + self.parent.winfo_width() // 2 - 700 // 2
         y = self.parent.winfo_y() + self.parent.winfo_height() // 2 - 400 // 2
         add_recipe.geometry("+{}+{}".format(x, y))
