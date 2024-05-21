@@ -1,7 +1,7 @@
 import tkinter as tk
 from backend import project10_db as db
 from tkinter import ttk, simpledialog, messagebox
-
+from add_edit_recipe import AddEditRecipe
 
 class Recipes(tk.Frame):
 
@@ -16,9 +16,10 @@ class Recipes(tk.Frame):
         for recipe in recipes:
             self.recipes_table.insert("", "end", values=(recipe.id, recipe.name))
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
 
+        self.parent = parent
         self.selected_recipe = tk.IntVar()
 
         self.search_var = tk.StringVar()
@@ -86,16 +87,32 @@ class Recipes(tk.Frame):
             self.recipes_table.heading("name", text="Αναζήτηση για {}".format(self.search_var.get()))
             self.load_recipes(self.search_var.get())
 
+    def open_add_edit_recipe(self, recipe_id=None):
+
+        add_recipe = AddEditRecipe(self, recipe_id=recipe_id)
+
+        add_recipe.minsize(700, 400)
+        add_recipe.resizable(True, True)
+        print(add_recipe.winfo_width())
+        x = self.parent.winfo_x() + self.parent.winfo_width() // 2 - 700 // 2
+        y = self.parent.winfo_y() + self.parent.winfo_height() // 2 - 400 // 2
+        add_recipe.geometry("+{}+{}".format(x, y))
+
+        add_recipe.transient(self)
+        add_recipe.grab_set()
+        self.wait_window(add_recipe)
+
+
 
     def add_recipe(self):
-        pass
+        self.open_add_edit_recipe()
 
     def delete_recipe(self):
         result = messagebox.askyesno("Διαγραφή", f"Είστε σίγουροι ότι θέλετε να διαγράψετε τη συνταγή με id:{self.selected_recipe.get()};", parent=self)
 
 
     def edit_recipe(self):
-        pass
+        self.open_add_edit_recipe(recipe_id=self.selected_recipe.get())
 
     def execute_recipe(self):
         pass
