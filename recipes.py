@@ -19,6 +19,8 @@ class Recipes(tk.Frame):
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
 
+        self.selected_recipe = tk.IntVar()
+
         self.search_var = tk.StringVar()
         self.search_var.trace_add("write", self.search_recipes)
 
@@ -58,8 +60,23 @@ class Recipes(tk.Frame):
         self.recipes_table.heading("name", text="Συνταγή")
         self.recipes_table.column("name", width=200)
         self.recipes_table.pack(fill="both", expand=True)
+        self.recipes_table.bind("<<TreeviewSelect>>", self.select_recipe)
 
         self.load_recipes()
+
+    def select_recipe(self, event):
+        try:
+            item = self.recipes_table.selection()[0]
+            self.selected_recipe.set(self.recipes_table.item(item)["values"][0])
+            self.delete_recipe_button.config(state="normal")
+            self.edit_recipe_button.config(state="normal")
+            self.execute_recipe_button.config(state="normal")
+        except IndexError:
+            self.selected_recipe.set(0)
+            self.delete_recipe_button.config(state="disabled")
+            self.edit_recipe_button.config(state="disabled")
+            self.execute_recipe_button.config(state="disabled")
+
 
     def search_recipes(self, var, index, mode):
         if (self.search_var.get() == ""):
