@@ -1,6 +1,6 @@
 import tkinter as tk
 from backend import project10_db as db
-from tkinter import ttk, simpledialog
+from tkinter import ttk, simpledialog, messagebox
 
 
 class Recipes(tk.Frame):
@@ -91,7 +91,8 @@ class Recipes(tk.Frame):
         pass
 
     def delete_recipe(self):
-        pass
+        result = messagebox.askyesno("Διαγραφή", f"Είστε σίγουροι ότι θέλετε να διαγράψετε τη συνταγή με id:{self.selected_recipe.get()};", parent=self)
+
 
     def edit_recipe(self):
         pass

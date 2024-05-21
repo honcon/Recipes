@@ -22,10 +22,10 @@ class App(tk.Tk):
         self.resizable(True, True)
         self.title("Συνταγες Μαγειρικης")
 
-        self.label = tk.Label(self, text="Recipes", font=("Arial", 24), border=1, relief="solid", padx=10, pady=10)
+        self.label = tk.Label(self, text="Recipes", font=("Arial", 24), border=0, relief="solid", padx=10, pady=10)
         self.label.pack(fill="x")
 
-        leftbar = tk.Frame(self, border=1, relief="solid", padx=10, pady=10)
+        leftbar = tk.Frame(self, border=0, relief="solid", padx=10, pady=10)
         leftbar.pack(fill="y", side="left", expand=False)
 
         recipes_button = tk.Button(leftbar, text="Συνταγές", width=15, command=lambda: self.set_menu(self.menu_type["recipes"]))
@@ -34,7 +34,7 @@ class App(tk.Tk):
         ingredients_button = tk.Button(leftbar, text="Υλικά", width=15, command=lambda: self.set_menu(self.menu_type["ingredients"]))
         ingredients_button.pack()
 
-        mainframe = tk.Frame(self, border=1, relief="solid", padx=10, pady=10)
+        mainframe = tk.Frame(self, border=0, relief="solid", padx=10, pady=10)
         mainframe.pack(fill="both", side="left", expand=True)
 
         self.recipes = Recipes(self)
