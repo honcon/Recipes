@@ -7,7 +7,7 @@ from tkscrolledframe import ScrolledFrame
 
 class StepFrame(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent.steps_frame, *args, **kwargs, border=1, relief="solid")
+        tk.Frame.__init__(self, parent.steps_frame, *args, **kwargs, bd=1, relief="raised")
 
         self.step_number = kwargs.get("step_number", 0)
         self.title = tk.StringVar(value=kwargs.get("title", ""))
@@ -149,8 +149,6 @@ class AddEditRecipe(tk.Toplevel):
         self.scrolled_frame.pack(fill="both", expand=True)
         self.steps_frame = self.scrolled_frame.display_widget(tk.Frame, fit_width=True)
 
-
-
     def delete_step(self, step):
         # self.steps.remove(step)
         print(self.steps.index({ "step_number": step.step_number }))
@@ -168,6 +166,8 @@ class AddEditRecipe(tk.Toplevel):
 
     def add_step(self):
         self.steps.append(StepFrame(self))
+        # reorderging steps
+
     
     def delete_step(self, step):
         self.steps.remove(step)
