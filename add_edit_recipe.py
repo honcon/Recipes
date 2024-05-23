@@ -7,20 +7,21 @@ from tkscrolledframe import ScrolledFrame
 
 class StepFrame(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
-        tk.Frame.__init__(self, parent.steps_frame, *args, **kwargs, bd=1, relief="raised")
+        tk.Frame.__init__(self, parent.steps_frame, *args, **kwargs, bd=2, relief="raised")
 
         self.step_number = kwargs.get("step_number", 0)
         self.title = tk.StringVar(value=kwargs.get("title", ""))
         self.description = tk.StringVar(value=kwargs.get("description", ""))
         self.execution_time = tk.IntVar(value=kwargs.get("execution_time", 0))
+        self.execution_time.trace_add("write", lambda *args: parent.calculate_execution_time())
 
-        # step_frame = tk.Frame(self.steps_frame, border=1, relief="solid")
-        # step_frame.grid(pady=5)
         self.pack(fill="x", expand=True)
 
         head_frame = tk.Frame(self, padx=10, pady=10)
         head_frame.columnconfigure(0, weight=1)
         step_label = tk.Label(head_frame, text=f"Βήμα {self.step_number}", font=("Helvetica", 13, "bold"), anchor="w")
+        # step_label = tk.Label(head_frame, textvariable=self.execution_time, anchor="w")
+
         step_label.grid(row=0, column=0, sticky="w")
 
         delete_button = tk.Button(head_frame, text="Διαγραφή", command=lambda: parent.delete_step(self))
@@ -28,10 +29,10 @@ class StepFrame(tk.Frame):
         
         head_frame.pack(fill="x", expand=True)
         separator = ttk.Separator(self, orient="horizontal") 
-        separator.pack(fill="x")
+        separator.pack(fill="x", padx=10)
         
 
-        # Title
+    # Title
 
         title_frame = tk.Frame(self, padx=10, pady=10)
         title_frame.grid_columnconfigure(1, weight=1)
@@ -44,19 +45,32 @@ class StepFrame(tk.Frame):
 
         title_frame.pack(fill="x", expand=True)
 
-        # Execution Time in hours and minutes
+    # Execution Time in hours and minutes
         time_frame = tk.Frame(self, padx=10, pady=10)
-        time_frame.grid_columnconfigure(1, weight=1)
+        time_frame.grid_columnconfigure(5, weight=1)
 
         time_label = tk.Label(time_frame, text="Χρόνος Εκτέλεσης", font=("Helvetica", 12, "bold"), width=20, anchor="e")
         time_label.grid(row=0, column=0, sticky="w")
 
-        time_entry = tk.Entry(time_frame, textvariable=self.execution_time)
-        time_entry.grid(row=0, column=1, sticky="we")
+
+        self.time_entry_hours = tk.Entry(time_frame, width=3)
+        self.time_entry_hours.grid(row=0, column=1, sticky="w")
+        self.time_entry_hours.bind("<KeyRelease>", self.on_update_hours)
+
+        label_hours = tk.Label(time_frame, text="Ώρες", font=("Helvetica", 12))
+        label_hours.grid(row=0, column=2, sticky="w")
+
+        self.time_entry_minutes = tk.Entry(time_frame, width=3)
+        self.time_entry_minutes.grid(row=0, column=3, sticky="w")
+        self.time_entry_minutes.bind("<KeyRelease>", self.on_update_minutes)
+
+        label_minutes = tk.Label(time_frame, text="Λεπτά", font=("Helvetica", 12))
+        label_minutes.grid(row=0, column=4, sticky="w")
 
         time_frame.pack(fill="x", expand=True)
 
-        # Description
+
+    # Description
 
         description_frame = tk.Frame(self, padx=10, pady=10)
         description_frame.grid_columnconfigure(1, weight=1)
@@ -74,6 +88,28 @@ class StepFrame(tk.Frame):
         description_frame.pack(fill="x", expand=True)
 
 
+    def on_update_hours(self, e):
+        value = self.time_entry_hours.get()
+
+        if not value.isdigit() or not 0 <= int(value) <= 99:
+            self.time_entry_hours.delete(0, tk.END)
+
+        self.update_time()
+
+
+    def on_update_minutes(self, e):
+        value = self.time_entry_minutes.get()
+
+        if not value.isdigit() or not 0 <= int(value) <= 59:
+            self.time_entry_minutes.delete(0, tk.END)
+
+        self.update_time()
+
+
+    def update_time(self):
+        total_minutes = int(self.time_entry_hours.get() or 0) * 60 + int(self.time_entry_minutes.get() or 0)
+        self.execution_time.set(total_minutes)
+
 class AddEditRecipe(tk.Toplevel):
 
     def __init__(self, parent, recipe_id, *args, **kwargs):
@@ -85,6 +121,9 @@ class AddEditRecipe(tk.Toplevel):
         self.categories = self.get_categories()
         
         self.name = tk.StringVar()
+        self.execution_time = tk.IntVar()
+        self.execution_time.trace_add("write", lambda *args: self.update_time())
+
         self.steps = []
 
         self.title(f"Επεξεργασία Συνταγής {recipe_id}" if self.edit_mode else "Δημιουργία")
@@ -133,10 +172,12 @@ class AddEditRecipe(tk.Toplevel):
         self.recipe_difficulty = ttk.Combobox(left_frame, state="readonly", values=["Εύκολη", "Μέτρια", "Δύσκολη"])
         self.recipe_difficulty.pack(fill="x")
 
+
         self.recipe_time_label = tk.Label(left_frame, text="Χρόνος Προετοιμασίας", anchor="w", font=("Helvetica", 13, "bold"))
         self.recipe_time_label.pack(fill="x")
 
-        self.recipe_time = tk.Entry(left_frame)
+
+        self.recipe_time = tk.Entry(left_frame, state="readonly")
         self.recipe_time.pack(fill="x")
 
         # Steps
@@ -149,12 +190,15 @@ class AddEditRecipe(tk.Toplevel):
         self.scrolled_frame.pack(fill="both", expand=True)
         self.steps_frame = self.scrolled_frame.display_widget(tk.Frame, fit_width=True)
 
-    def delete_step(self, step):
-        # self.steps.remove(step)
-        print(self.steps.index({ "step_number": step.step_number }))
-        # self.steps.pop(self.steps.index(step))
-        # self.steps = [s for s in self.steps if s != step]
-        # self.render_steps()
+        self.update_time()
+
+        self.add_step()
+
+    def calculate_execution_time(self):
+        total_time = 0
+        for step in self.steps:
+            total_time += step.execution_time.get()
+        self.execution_time.set(total_time)
 
     def get_categories(self):
         categories = list(db.RecipeCategory.select())
@@ -168,7 +212,18 @@ class AddEditRecipe(tk.Toplevel):
         self.steps.append(StepFrame(self))
         # reorderging steps
 
-    
     def delete_step(self, step):
         self.steps.remove(step)
         step.destroy()
+        self.calculate_execution_time()
+
+    def time_format(self, minutes):
+        hours = minutes // 60
+        minutes = minutes % 60
+        return f"{hours} ώρες και {minutes} λεπτά" if hours > 0 else f"{minutes} λεπτά"
+    
+    def update_time(self):
+        self.recipe_time.configure(state='normal')
+        self.recipe_time.delete(0, tk.END)
+        self.recipe_time.insert(0, self.time_format(self.execution_time.get()))
+        self.recipe_time.configure(state='readonly')
