@@ -24,7 +24,7 @@ class StepFrame(tk.Frame):
 
         step_label.grid(row=0, column=0, sticky="w")
 
-        delete_button = tk.Button(head_frame, text="Διαγραφή", command=lambda: parent.delete_step(self))
+        delete_button = tk.Button(head_frame, text="Διαγραφή Βήματος", command=lambda: parent.delete_step(self))
         delete_button.grid(row=0, column=1, sticky="e")
         
         head_frame.pack(fill="x", expand=True)
@@ -70,6 +70,36 @@ class StepFrame(tk.Frame):
         time_frame.pack(fill="x", expand=True)
 
 
+    # Ingredients
+
+        ingredients_frame = tk.Frame(self, padx=10, pady=10)
+        ingredients_frame.grid_columnconfigure(1, weight=1)
+
+        ingredients_label = tk.Label(ingredients_frame, text="Υλικά", font=("Helvetica", 12, "bold"), width=20, anchor="e")
+        ingredients_label.grid(row=1, column=0, sticky="w")
+        
+        ingredients_top_bar = tk.Frame(ingredients_frame)
+        ingredients_top_bar.grid(row=0, column=1, sticky="we")
+        ingredients_top_bar.grid_columnconfigure(2, weight=1)
+
+        self.ingredient_list = ttk.Combobox(ingredients_top_bar, state="readonly", values=["Αλεύρι", "Αλάτι", "Ζάχαρη"])
+        self.ingredient_list.grid(row=0, column=0, sticky="w")
+
+
+        add_ingredient_button = tk.Button(ingredients_top_bar, text="Προσθήκη", command=self.add_ingredient)
+        add_ingredient_button.grid(row=0, column=1, sticky="w")
+        
+        delete_ingredient_button = tk.Button(ingredients_top_bar, text="Διαγραφή Υλικού")
+        delete_ingredient_button.grid(row=0, column=2, sticky="e")
+
+        self.ingredients_table = ttk.Treeview(ingredients_frame, columns=("id", "name"), selectmode="browse", show='headings', height=5)
+        self.ingredients_table["displaycolumns"] = ["name"]
+        self.ingredients_table.heading("name", text="Υλικό")
+        self.ingredients_table.column("name", width=200)
+
+        self.ingredients_table.grid(row=1, column=1, sticky="we")
+
+        ingredients_frame.pack(fill="x", expand=True)
     # Description
 
         description_frame = tk.Frame(self, padx=10, pady=10)
@@ -78,7 +108,7 @@ class StepFrame(tk.Frame):
         description_label = tk.Label(description_frame, text="Περιγραφή", font=("Helvetica", 12, "bold"), width=20, anchor="e")
         description_label.grid(row=0, column=0, sticky="w")
 
-        description_entry = tk.Text(description_frame, height=5, width=30)
+        description_entry = tk.Text(description_frame, height=10, width=30)
         description_entry.insert(tk.END, self.description.get())
 
         description_entry.bind("<KeyRelease>", lambda e: self.description.set(description_entry.get("1.0", tk.END)))
@@ -87,6 +117,11 @@ class StepFrame(tk.Frame):
 
         description_frame.pack(fill="x", expand=True)
 
+    def add_ingredient(self):
+        ingredient = self.ingredient_list.get()
+        # clear
+        self.ingredient_list.set("")
+        self.ingredients_table.insert("", "end", values=(1, ingredient))
 
     def on_update_hours(self, e):
         value = self.time_entry_hours.get()
