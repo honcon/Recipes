@@ -1,5 +1,5 @@
 import tkinter as tk
-from backend import project10_db as db
+from backend import db as db
 from tkinter import ttk, simpledialog
 
 class Ingredients(tk.Frame):

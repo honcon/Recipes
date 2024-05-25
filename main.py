@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import messagebox
 from ingredients import Ingredients
 from recipes import Recipes
-from backend import project10_db as db
+from backend import db as db
 
 class App(tk.Tk):
     menu_type = { "recipes": 0, "ingredients": 1 }

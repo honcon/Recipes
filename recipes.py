@@ -1,5 +1,5 @@
 import tkinter as tk
-from backend import project10_db as db
+from backend import db as db
 from tkinter import ttk, simpledialog, messagebox
 from add_edit_recipe import AddEditRecipe
 
@@ -64,6 +64,10 @@ class Recipes(tk.Frame):
         self.recipes_table.bind("<<TreeviewSelect>>", self.select_recipe)
 
         self.load_recipes()
+
+        # Add 1 second delay to allow the table to load before selecting the first row
+        self.after(1, self.open_add_edit_recipe)
+
 
     def select_recipe(self, event):
         try:

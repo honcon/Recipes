@@ -1,4 +1,4 @@
-from project10_utilities_updated import *
+from utilities import *
 
 
 def close_app():

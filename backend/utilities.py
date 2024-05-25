@@ -1,11 +1,12 @@
-from project10_db import *
+from backend.db import *
 from peewee import IntegrityError
 
+# db.init_db()
 
 def add_full_recipe(recipe_data):
     try:
         with db.atomic():
-            category, _ = RecipeCategory.get_or_create(name=recipe_data['category_name'])
+            category, _ = RecipeCategory.get_or_create(name=recipe_data['category'])
 
             recipe = Recipe.create(
                 name=recipe_data['name'],
@@ -15,21 +16,22 @@ def add_full_recipe(recipe_data):
             )
 
             for step_data in recipe_data['steps']:
-                ingredient, _ = Ingredient.get_or_create(name=step_data['ingredient_name'])
                 step = Step.create(
                     recipe_id=recipe,
                     title=step_data['title'],
                     description=step_data['description'],
                     number=step_data['number'],
-                    execution_time=step_data['step_execution_time']
+                    execution_time=step_data['execution_time']
                 )
-
-                RecipesIngredients.create(
-                    recipe_id=recipe,
-                    ingredient_id=ingredient,
-                    step_id=step,
-                    quantity=step_data['ingredient_quantity']
-                )
+                
+                for ingredient_name in step_data['ingredients']:
+                    print(ingredient_name)
+                    ingredient, _ = Ingredient.get_or_create(name=ingredient_name)
+                    RecipesIngredients.create(
+                        recipe_id=recipe,
+                        ingredient_id=ingredient,
+                        step_id=step
+                    )
 
         return {"success": True, "message": "Recipe and details added successfully."}
 
@@ -40,28 +42,71 @@ def add_full_recipe(recipe_data):
         return {"success": False, "message": f"Error: {e}"}
 
 
-recipe_dt = {
-    'name': 'Carbonara',
-    'category_name': 'Pasta',
-    'difficulty': 2,
-    'execution_time': 20,  # in minutes
-    'steps': [
-        {'title': 'Prepare Ingredients',
-         'description': 'Measure all the ingredients.',
-         'ingredient_name': 'Spaghetti',
-         'ingredient_quantity': 100,  # grams
-         'number': 1,
-         'step_execution_time': 5},  # in minutes
-        {'title': 'Cook Pasta',
-         'description': 'Boil water and cook pasta.',
-         'ingredient_name': 'Water',
-         'ingredient_quantity': 1000,  # ml
-         'number': 2,
-         'step_execution_time': 10}
-    ]
-}
+def get_full_recipe(recipe_id):
+    try:
+        recipe = Recipe.get_by_id(recipe_id)
+        recipe_data = {
+            "id": recipe.id,
+            "name": recipe.name,
+            "category": recipe.category.name,
+            "difficulty": recipe.difficulty,
+            "execution_time": recipe.execution_time,
+            "steps": []
+        }
 
-add_full_recipe(recipe_dt)
+        steps = (Step.select().where(Step.recipe_id == recipe_id).order_by(Step.number))
+
+        for step in steps:
+            step_data = {
+                "id": step.id,
+                "title": step.title,
+                "description": step.description,
+                "number": step.number,
+                "execution_time": step.execution_time,
+                "ingredients": []
+            }
+
+            ingredients = (RecipesIngredients.select().where(RecipesIngredients.step_id == step.id))
+
+            for ingredient in ingredients:
+                step_data["ingredients"].append({
+                    "id": ingredient.ingredient_id.id,
+                    "name": ingredient.ingredient_id.name,
+                    "quantity": ingredient.quantity
+                })
+
+            recipe_data["steps"].append(step_data)
+
+        return {"success": True, "recipe": recipe_data}
+
+    except Recipe.DoesNotExist:
+        return {"success": False, "message": "Recipe does not exist."}
+
+    except Exception as e:
+        return {"success": False, "message": f"Error: {e}"}
+
+# recipe_dt = {
+#     'name': 'Carbonara',
+#     'category_name': 'Pasta',
+#     'difficulty': 2,
+#     'execution_time': 20,  # in minutes
+#     'steps': [
+#         {'title': 'Prepare Ingredients',
+#          'description': 'Measure all the ingredients.',
+#          'ingredient_name': 'Spaghetti',
+#          'ingredient_quantity': 100,  # grams
+#          'number': 1,
+#          'step_execution_time': 5},  # in minutes
+#         {'title': 'Cook Pasta',
+#          'description': 'Boil water and cook pasta.',
+#          'ingredient_name': 'Water',
+#          'ingredient_quantity': 1000,  # ml
+#          'number': 2,
+#          'step_execution_time': 10}
+#     ]
+# }
+
+# add_full_recipe(recipe_dt)
 
 
 def search_recipe(name=None, category=None):
