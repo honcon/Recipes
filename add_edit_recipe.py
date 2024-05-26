@@ -1,5 +1,5 @@
 import tkinter as tk
-from backend import db as db
+from backend import db, utilities
 from tkinter import messagebox, ttk
 from tkscrolledframe import ScrolledFrame
 from pprint import pprint
@@ -298,10 +298,14 @@ class AddEditRecipe(tk.Toplevel):
             
             recipe_data["steps"].append(step_data)
 
-        pprint(recipe_data)
+        result = utilities.add_full_recipe(recipe_data)
+        if result["success"]:
+            self.parent.load_recipes()
+            self.destroy()
+            messagebox.showinfo("Αποθήκευση", "Η συνταγή αποθηκεώθηκε επιτυχώς", parent=self.parent)
+        else:
+            messagebox.showinfo("Αποθήκευση", f"Σφάλμα {result["message"]}", parent=self)
 
-        # close this window
-        self.destroy()
 
     def order_steps(self):
         for i, step in enumerate(self.steps):
