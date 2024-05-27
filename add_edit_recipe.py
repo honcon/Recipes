@@ -307,8 +307,6 @@ class AddEditRecipe(tk.Toplevel):
         return [category.name for category in categories]
 
     def save(self):
-        # alert user that the recipe was saved
-        # messagebox.showinfo("Αποθήκευση", "Η συνταγή αποθηκεώθηκε επιτυχώς", parent=self)
         recipe_data = {
             "name": self.name.get(),
             "category": self.recipe_category.get(),
@@ -386,16 +384,16 @@ class AddEditRecipe(tk.Toplevel):
         return {ingredient.id: ingredient.name for ingredient in ingredients}
 
     def validate_recipe(self, recipe_data):
-        if not recipe_data["name"]:
+        if not recipe_data["name"] or recipe_data["name"].strip() == "":
             return "Το όνομα της συνταγής είναι υποχρεωτικό"
-        if not recipe_data["category"]:
+        if not recipe_data["category"] or recipe_data["category"].strip() == "":
             return "Η κατηγορία της συνταγής είναι υποχρεωτική"
         if not 1 <= recipe_data["difficulty"] <= 3:
             return "Η δυσκολία της συνταγής είναι υποχρεωτική"
         if len(self.steps) < 1:
             return "Η συνταγή πρέπει να περιέχει τουλάχιστον ένα βήμα"
         for step in recipe_data["steps"]:
-            if not step["title"]:
+            if not step["title"] or step["title"].strip() == "":
                 return f"Ο τίτλος του βήματος {step["number"]} είναι υποχρεωτικός"
             if not step["description"] or step["description"].strip() == "":
                 return f"Η περιγραφή του βήματος {step["number"]} είναι υποχρεωτική"
