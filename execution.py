@@ -80,6 +80,21 @@ class Execution(tk.Toplevel):
 
         Welcome(self, recipe_id).place(in_=self.mainframe, x=0, y=0, relwidth=1, relheight=1)
 
+    def update_progress(self):
+        total_time = self.recipe["execution_time"]
+
+        if self.selected_step == -1:
+            self.progress.set(0)
+        elif self.selected_step == len(self.recipe["steps"]):
+            self.progress.set(100)
+        else:
+            elapsed_time = 0
+            for i in range(self.selected_step):
+                elapsed_time += self.recipe["steps"][i]["execution_time"]
+
+            percentage = int((elapsed_time / total_time) * 100)
+            self.progress.set(percentage)
+
     def previous_step(self):
         self.selected_step -= 1
         if self.selected_step >= 0:
@@ -90,9 +105,12 @@ class Execution(tk.Toplevel):
             Welcome(self, self.recipe_id).place(in_=self.mainframe, x=0, y=0, relwidth=1, relheight=1)
             self.previous_button["state"] = "disabled"
             self.next_button["state"] = "normal"
+        
+        self.update_progress()
 
     def next_step(self):
         self.selected_step += 1
+
         if self.selected_step < len(self.recipe["steps"]):
             Step(self, self.recipe["steps"][self.selected_step]).place(in_=self.mainframe, x=0, y=0, relwidth=1, relheight=1)
             self.previous_button["state"] = "normal"
@@ -101,3 +119,5 @@ class Execution(tk.Toplevel):
             Finish(self).place(in_=self.mainframe, x=0, y=0, relwidth=1, relheight=1)
             self.previous_button["state"] = "normal"
             self.next_button["state"] = "disabled"
+
+        self.update_progress()
