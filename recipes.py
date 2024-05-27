@@ -2,6 +2,7 @@ import tkinter as tk
 from backend import db, utilities
 from tkinter import ttk, simpledialog, messagebox
 from add_edit_recipe import AddEditRecipe
+from execution import Execution
 
 class Recipes(tk.Frame):
 
@@ -46,7 +47,7 @@ class Recipes(tk.Frame):
         self.edit_recipe_button.grid(row=0, column=1, sticky="w")
         self.edit_recipe_button.config(state="disabled")
 
-        self.execute_recipe_button = tk.Button(button_frame, text="Εκτέλεση", command=self.execute_recipe)
+        self.execute_recipe_button = tk.Button(button_frame, text="Εκτέλεση", command=lambda: self.execute_recipe(self.selected_recipe.get()))
         self.execute_recipe_button.grid(row=0, column=2, sticky="w")
         self.execute_recipe_button.config(state="disabled")
 
@@ -64,9 +65,6 @@ class Recipes(tk.Frame):
         self.recipes_table.bind("<<TreeviewSelect>>", self.select_recipe)
 
         self.load_recipes()
-
-        # Add 1 second delay to allow the table to load before selecting the first row
-        self.after(1, self.open_add_edit_recipe)
 
 
     def select_recipe(self, event):
@@ -107,6 +105,19 @@ class Recipes(tk.Frame):
         self.wait_window(add_recipe)
 
 
+    def execute_recipe(self, recipe_id):
+        execution = Execution(self, recipe_id=recipe_id)
+
+        execution.minsize(700, 400)
+        execution.resizable(True, True)
+
+        x = self.parent.winfo_x() + self.parent.winfo_width() // 2 - 700 // 2
+        y = self.parent.winfo_y() + self.parent.winfo_height() // 2 - 400 // 2
+        execution.geometry("+{}+{}".format(x, y))
+
+        execution.transient(self)
+        execution.grab_set()
+        self.wait_window(execution)
 
     def add_recipe(self):
         self.open_add_edit_recipe()
@@ -124,6 +135,3 @@ class Recipes(tk.Frame):
 
     def edit_recipe(self):
         self.open_add_edit_recipe(recipe_id=self.selected_recipe.get())
-
-    def execute_recipe(self):
-        pass
