@@ -191,6 +191,7 @@ class AddEditRecipe(tk.Toplevel):
     def __init__(self, parent, recipe_id, *args, **kwargs):
         tk.Toplevel.__init__(self, parent, *args, **kwargs)
         
+        self.recipe_id = recipe_id
         self.edit_mode = recipe_id and recipe_id > 0
         self.parent = parent
 
@@ -331,14 +332,19 @@ class AddEditRecipe(tk.Toplevel):
         validation_error = self.validate_recipe(recipe_data)
         if validation_error:
             return messagebox.showinfo("Σφαλμα", validation_error, parent=self)
-
-        result = utilities.add_full_recipe(recipe_data)
-        if result["success"]:
+        
+        if self.edit_mode:
+            response = utilities.update_recipe(self.recipe_id, recipe_data)
+        else:
+            response = utilities.add_full_recipe(recipe_data)
+        
+        if response["success"]:
             self.parent.load_recipes()
             self.destroy()
-            messagebox.showinfo("Αποθήκευση", "Η συνταγή αποθηκεώθηκε επιτυχώς", parent=self.parent)
+            messagebox.showinfo("Αποθήκευση", f"Η συνταγή {self.edit_mode and "ενημερώθηκε" or "προστέθηκε"} επιτυχώς", parent=self.parent)
+
         else:
-            messagebox.showinfo("Αποθήκευση", f"Σφάλμα {result["message"]}", parent=self)
+            messagebox.showinfo("Αποθήκευση", f"Σφάλμα {response["message"]}", parent=self)
 
 
     def order_steps(self):

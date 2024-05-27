@@ -1,5 +1,5 @@
 import tkinter as tk
-from backend import db as db
+from backend import db, utilities
 from tkinter import ttk, simpledialog, messagebox
 from add_edit_recipe import AddEditRecipe
 
@@ -113,6 +113,13 @@ class Recipes(tk.Frame):
 
     def delete_recipe(self):
         result = messagebox.askyesno("Διαγραφή", f"Είστε σίγουροι ότι θέλετε να διαγράψετε τη συνταγή με id:{self.selected_recipe.get()};", parent=self)
+        if result:
+            response = utilities.delete_recipe(self.selected_recipe.get())
+
+            if response["success"]:
+                self.load_recipes()
+            else:
+                messagebox.showerror("Σφάλμα", response["message"], parent=self)
 
 
     def edit_recipe(self):

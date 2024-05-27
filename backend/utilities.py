@@ -25,7 +25,6 @@ def add_full_recipe(recipe_data):
                 )
                 
                 for ingredient_name in step_data['ingredients']:
-                    print(ingredient_name)
                     ingredient, _ = Ingredient.get_or_create(name=ingredient_name)
                     RecipesIngredients.create(
                         recipe_id=recipe,
@@ -78,6 +77,60 @@ def get_full_recipe(recipe_id):
             recipe_data["steps"].append(step_data)
 
         return {"success": True, "recipe": recipe_data}
+
+    except Recipe.DoesNotExist:
+        return {"success": False, "message": "Recipe does not exist."}
+
+    except Exception as e:
+        return {"success": False, "message": f"Error: {e}"}
+
+def delete_recipe(recipe_id):
+    try:
+        recipe = Recipe.get_by_id(recipe_id)
+        recipe.delete_instance(recursive=True)
+        return {"success": True, "message": "Recipe deleted successfully."}
+
+    except Recipe.DoesNotExist:
+        return {"success": False, "message": "Recipe does not exist."}
+
+    except Exception as e:
+        return {"success": False, "message": f"Error: {e}"}
+
+def update_recipe(recipe_id, updated_data):
+    try:
+        with db.atomic():
+            recipe = Recipe.get_by_id(recipe_id)
+            recipe.delete_instance(recursive=True)
+
+            category, _ = RecipeCategory.get_or_create(name=updated_data['category'])
+
+            recipe = Recipe.create(
+                id=recipe_id,
+                name=updated_data['name'],
+                category=category,
+                difficulty=updated_data['difficulty'],
+                execution_time=updated_data['execution_time']
+            )
+
+            for step_data in updated_data['steps']:
+                step = Step.create(
+                    recipe_id=recipe,
+                    title=step_data['title'],
+                    description=step_data['description'],
+                    number=step_data['number'],
+                    execution_time=step_data['execution_time']
+                )
+                
+                for ingredient_name in step_data['ingredients']:
+                    ingredient, _ = Ingredient.get_or_create(name=ingredient_name)
+                    RecipesIngredients.create(
+                        recipe_id=recipe,
+                        ingredient_id=ingredient,
+                        step_id=step
+                    )
+
+
+        return {"success": True, "message": "Recipe updated successfully."}
 
     except Recipe.DoesNotExist:
         return {"success": False, "message": "Recipe does not exist."}
