@@ -116,14 +116,19 @@ class StepFrame(tk.Frame):
         description_label = tk.Label(description_frame, text="Περιγραφή", font=("Helvetica", 12, "bold"), width=20, anchor="e")
         description_label.grid(row=0, column=0, sticky="w")
 
-        description_entry = tk.Text(description_frame, height=10, width=30)
-        description_entry.insert(tk.END, self.description.get())
+        self.description_entry = tk.Text(description_frame, height=10, width=30)
+        self.description_entry.insert(tk.END, self.description.get())
 
-        description_entry.bind("<KeyRelease>", lambda e: self.description.set(description_entry.get("1.0", tk.END)))
+        self.description_entry.bind("<KeyRelease>", lambda e: self.description.set(self.description_entry.get("1.0", tk.END)))
 
-        description_entry.grid(row=0, column=1, sticky="we")
+        self.description_entry.grid(row=0, column=1, sticky="we")
 
         description_frame.pack(fill="x", expand=True)
+
+    def set_description(self, description):
+        self.description.set(description)
+        self.description_entry.delete("1.0", tk.END)
+        self.description_entry.insert(tk.END, description)
 
     def on_change_ingredient_from_list(self, e):
         if self.ingredient_list.get():
@@ -169,6 +174,13 @@ class StepFrame(tk.Frame):
 
         self.update_time()
 
+    def load_time(self, minutes):
+        self.execution_time.set(minutes)
+        hours = minutes // 60
+        minutes = minutes % 60
+
+        self.time_entry_hours.insert(0, hours)
+        self.time_entry_minutes.insert(0, minutes)
 
     def update_time(self):
         total_minutes = int(self.time_entry_hours.get() or 0) * 60 + int(self.time_entry_minutes.get() or 0)
@@ -262,7 +274,27 @@ class AddEditRecipe(tk.Toplevel):
 
         self.update_time()
 
-        self.add_step()
+        if self.edit_mode:
+            self.load_recipe(recipe_id)
+
+
+    def load_recipe(self, recipe_id):
+        recipe_data = utilities.get_full_recipe(recipe_id)
+
+        if recipe_data["success"]:
+            recipe = recipe_data["recipe"]
+            self.name.set(recipe["name"])
+            self.recipe_category.set(recipe["category"])
+            self.difficulty.set(recipe["difficulty"])
+            self.recipe_difficulty.set(["Εύκολη", "Μέτρια", "Δύσκολη"][recipe["difficulty"] - 1])
+            self.execution_time.set(recipe["execution_time"])
+
+            for step in recipe["steps"]:
+                self.add_step(step)
+
+            self.calculate_execution_time()
+        else:
+            messagebox.showinfo("Σφάλμα", f"Σφάλμα: {recipe_data['message']}", parent=self)
 
     def calculate_execution_time(self):
         total_time = 0
@@ -298,6 +330,10 @@ class AddEditRecipe(tk.Toplevel):
             
             recipe_data["steps"].append(step_data)
 
+        validation_error = self.validate_recipe(recipe_data)
+        if validation_error:
+            return messagebox.showinfo("Σφαλμα", validation_error, parent=self)
+
         result = utilities.add_full_recipe(recipe_data)
         if result["success"]:
             self.parent.load_recipes()
@@ -311,9 +347,18 @@ class AddEditRecipe(tk.Toplevel):
         for i, step in enumerate(self.steps):
             step.step_number.set(i + 1)
 
-    def add_step(self):
-        self.steps.append(StepFrame(self))
-        # reorderging steps
+    def add_step(self, step_data=None):
+        step = StepFrame(self)
+
+        if step_data:
+            step.title.set(step_data["title"])
+            step.set_description(step_data["description"])
+            step.load_time(step_data["execution_time"])
+
+            for ingredient in step_data["ingredients"]:
+                step.ingredients_table.insert("", "end", values=(ingredient["id"], ingredient["name"]))
+
+        self.steps.append(step)
         self.order_steps()
 
 
@@ -339,3 +384,23 @@ class AddEditRecipe(tk.Toplevel):
         # return [(ingredient.id, ingredient.name) for ingredient in ingredients]
         # return a dictionary with the id as the key and the name as the value
         return {ingredient.id: ingredient.name for ingredient in ingredients}
+
+    def validate_recipe(self, recipe_data):
+        if not recipe_data["name"]:
+            return "Το όνομα της συνταγής είναι υποχρεωτικό"
+        if not recipe_data["category"]:
+            return "Η κατηγορία της συνταγής είναι υποχρεωτική"
+        if not 1 <= recipe_data["difficulty"] <= 3:
+            return "Η δυσκολία της συνταγής είναι υποχρεωτική"
+        if len(self.steps) < 1:
+            return "Η συνταγή πρέπει να περιέχει τουλάχιστον ένα βήμα"
+        for step in recipe_data["steps"]:
+            if not step["title"]:
+                return f"Ο τίτλος του βήματος {step["number"]} είναι υποχρεωτικός"
+            if not step["description"] or step["description"].strip() == "":
+                return f"Η περιγραφή του βήματος {step["number"]} είναι υποχρεωτική"
+            if not step["execution_time"]:
+                return f"Ο χρόνος εκτέλεσης του βήματος {step["number"]} είναι υποχρεωτικός (τουλάχιστον 1 λεπτό)"
+            if len(step["ingredients"]) < 1:
+                return f"Το βήμα {step["number"]} πρέπει να περιέχει τουλάχιστον ένα υλικό"
+        return False
