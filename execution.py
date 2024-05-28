@@ -1,5 +1,5 @@
 import tkinter as tk
-from backend import db, utilities
+from backend import utilities
 from tkinter import messagebox, ttk
 
 class Welcome(tk.Frame):

@@ -1,7 +1,7 @@
 from backend.db import *
 from peewee import IntegrityError
 
-# db.init_db()
+init_db()
 
 def add_full_recipe(recipe_data):
     try:
