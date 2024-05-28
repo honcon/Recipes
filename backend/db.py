@@ -43,7 +43,6 @@ class RecipesIngredients(BaseModel):
     recipe_id = ForeignKeyField(Recipe, backref="recipes_ingredients_details")
     ingredient_id = ForeignKeyField(Ingredient, backref="used_in_recipes")
     step_id = ForeignKeyField(Step, backref="ingredient_steps")
-    quantity = IntegerField(null=True) # nullable
 
     class Meta:
         db_table = "recipes_ingredients"
