@@ -22,9 +22,6 @@ class App(tk.Tk):
         self.resizable(True, True)
         self.title("Συνταγες Μαγειρικης")
 
-        self.label = tk.Label(self, text="Recipes", font=("Arial", 24), border=0, relief="solid", padx=10, pady=10)
-        self.label.pack(fill="x")
-
         leftbar = tk.Frame(self, border=0, relief="solid", padx=10, pady=10)
         leftbar.pack(fill="y", side="left", expand=False)
 
