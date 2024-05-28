@@ -1,7 +1,9 @@
 from backend.db import *
 from peewee import IntegrityError
+from backend.initial_recipes import recipes as initial_recipes
 
 init_db()
+
 
 def add_full_recipe(recipe_data):
     try:
@@ -305,3 +307,9 @@ def execute_recipe(recipe_id):
 
     except Exception as e:
         return {"success": False, "message": f"Error: {e}"}
+
+recipes = Recipe.select()
+
+if recipes.count() == 0:
+    for recipe in initial_recipes():
+        add_full_recipe(recipe)
