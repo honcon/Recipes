@@ -8,25 +8,25 @@ init_db()
 def add_full_recipe(recipe_data):
     try:
         with db.atomic():
-            category, _ = RecipeCategory.get_or_create(name=recipe_data['category'])
+            category, _ = RecipeCategory.get_or_create(name=recipe_data["category"])
 
             recipe = Recipe.create(
-                name=recipe_data['name'],
+                name=recipe_data["name"],
                 category=category,
-                difficulty=recipe_data['difficulty'],
-                execution_time=recipe_data['execution_time']
+                difficulty=recipe_data["difficulty"],
+                execution_time=recipe_data["execution_time"]
             )
 
-            for step_data in recipe_data['steps']:
+            for step_data in recipe_data["steps"]:
                 step = Step.create(
                     recipe_id=recipe,
-                    title=step_data['title'],
-                    description=step_data['description'],
-                    number=step_data['number'],
-                    execution_time=step_data['execution_time']
+                    title=step_data["title"],
+                    description=step_data["description"],
+                    number=step_data["number"],
+                    execution_time=step_data["execution_time"]
                 )
                 
-                for ingredient_name in step_data['ingredients']:
+                for ingredient_name in step_data["ingredients"]:
                     ingredient, _ = Ingredient.get_or_create(name=ingredient_name)
                     RecipesIngredients.create(
                         recipe_id=recipe,
@@ -106,26 +106,26 @@ def update_recipe(recipe_id, updated_data):
             recipe = Recipe.get_by_id(recipe_id)
             recipe.delete_instance(recursive=True)
 
-            category, _ = RecipeCategory.get_or_create(name=updated_data['category'])
+            category, _ = RecipeCategory.get_or_create(name=updated_data["category"])
 
             recipe = Recipe.create(
                 id=recipe_id,
-                name=updated_data['name'],
+                name=updated_data["name"],
                 category=category,
-                difficulty=updated_data['difficulty'],
-                execution_time=updated_data['execution_time']
+                difficulty=updated_data["difficulty"],
+                execution_time=updated_data["execution_time"]
             )
 
-            for step_data in updated_data['steps']:
+            for step_data in updated_data["steps"]:
                 step = Step.create(
                     recipe_id=recipe,
-                    title=step_data['title'],
-                    description=step_data['description'],
-                    number=step_data['number'],
-                    execution_time=step_data['execution_time']
+                    title=step_data["title"],
+                    description=step_data["description"],
+                    number=step_data["number"],
+                    execution_time=step_data["execution_time"]
                 )
                 
-                for ingredient_name in step_data['ingredients']:
+                for ingredient_name in step_data["ingredients"]:
                     ingredient, _ = Ingredient.get_or_create(name=ingredient_name)
                     RecipesIngredients.create(
                         recipe_id=recipe,
