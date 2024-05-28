@@ -34,6 +34,9 @@ class App(tk.Tk):
         ingredients_button = tk.Button(leftbar, text="Υλικά", width=15, command=lambda: self.set_menu(self.menu_type["ingredients"]))
         ingredients_button.pack()
 
+        credits = tk.Label(leftbar, text="ΠΛΗΠΡΟ Τελική εργασία\nΔημιουργήθηκε από τούς:\nΔημήτρη Κωσταντακόπουλο,\nΚωνσταντίνο Χονδρό", font=("Arial", 9, 'bold'), fg="gray")
+        credits.pack(side="bottom")
+
         mainframe = tk.Frame(self, border=0, relief="solid", padx=10, pady=10)
         mainframe.pack(fill="both", side="left", expand=True)
 
