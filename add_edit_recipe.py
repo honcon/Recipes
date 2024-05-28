@@ -208,7 +208,7 @@ class AddEditRecipe(tk.Toplevel):
 
         self.steps = []
 
-        self.title(f"Επεξεργασία Συνταγής {recipe_id}" if self.edit_mode else "Δημιουργία")
+        self.title(f"Επεξεργασία Συνταγής id:{recipe_id}" if self.edit_mode else "Δημιουργία")
 
         top_bar = tk.Frame(self, padx=10, pady=10)
         top_bar.columnconfigure(0, weight=1)

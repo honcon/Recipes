@@ -93,10 +93,10 @@ class Recipes(tk.Frame):
 
         add_recipe = AddEditRecipe(self, recipe_id=recipe_id)
 
-        add_recipe.minsize(700, 400)
+        add_recipe.minsize(900, 400)
         add_recipe.resizable(True, True)
 
-        x = self.parent.winfo_x() + self.parent.winfo_width() // 2 - 700 // 2
+        x = self.parent.winfo_x() + self.parent.winfo_width() // 2 - 900 // 2
         y = self.parent.winfo_y() + self.parent.winfo_height() // 2 - 400 // 2
         add_recipe.geometry("+{}+{}".format(x, y))
 
@@ -108,11 +108,11 @@ class Recipes(tk.Frame):
     def execute_recipe(self, recipe_id):
         execution = Execution(self, recipe_id=recipe_id)
 
-        execution.minsize(700, 400)
+        execution.minsize(700, 500)
         execution.resizable(True, True)
 
         x = self.parent.winfo_x() + self.parent.winfo_width() // 2 - 700 // 2
-        y = self.parent.winfo_y() + self.parent.winfo_height() // 2 - 400 // 2
+        y = self.parent.winfo_y() + self.parent.winfo_height() // 2 - 500 // 2
         execution.geometry("+{}+{}".format(x, y))
 
         execution.transient(self)
