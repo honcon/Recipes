@@ -3,27 +3,77 @@ from backend import db, utilities
 from tkinter import messagebox, ttk
 
 class Welcome(tk.Frame):
-    def __init__(self, parent, recipe_id, *args, **kwargs):
+    def __init__(self, parent, recipe, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        self.label = tk.Label(self, text="Καλώς ήρθατε στην συνταγη!", font=("Arial", 24), border=0, relief="solid", padx=10, pady=10)
+        self.label = tk.Label(self, text="Ας προετοιμαστούμε για την εκτέλεση της συνταγής\n", font=("Arial", 14), anchor="w")
         self.label.pack(fill="x")
+
+        self.ingredients = []
+
+        for steps in recipe["steps"]:
+            for ingredient in steps["ingredients"]:
+                self.ingredients.append(ingredient["name"])
+
+        self.time_label = tk.Label(self, text="O χρόνος που απαιτείται για την εκτέλεση της συνταγής είναι: " , font=("Arial", 14), anchor="w")
+        self.time_label.pack(fill="x")
+
+        self.time_label_value = tk.Label(self, text=f"{self.time_format(int(recipe["execution_time"]))}", font=("Arial", 14, 'bold'), anchor="w")
+        self.time_label_value.pack(fill="x")
+
+        self.ingredients_label = tk.Label(self, text="\nΤα υλικά που θα χρειαστείτε είναι: ", font=("Arial", 14), anchor="w")
+        self.ingredients_label.pack(fill="x")
+        
+        self.ingredients_label_value = tk.Label(self, text=", ".join(self.ingredients), font=("Arial", 14, 'bold'), anchor="w")
+        self.ingredients_label_value.pack(fill="x")
+
+
+    def time_format(self, minutes):
+        hours = minutes // 60
+        minutes = minutes % 60
+        return f"{hours} ώρες και {minutes} λεπτά" if hours > 0 else f"{minutes} λεπτά"
 
 class Step(tk.Frame):
     def __init__(self, parent, step_data, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.step_data = step_data
+        self.ingredients = []
+        for ingredient in step_data["ingredients"]:
+            self.ingredients.append(ingredient["name"])
 
-        self.label = tk.Label(self, text=f"Βήμα {self.step_data['number']}", font=("Arial", 16), border=0, relief="solid", padx=10, pady=10)
-        self.label.pack(fill="x")
+        self.title_label = tk.Label(self, text=f"Βήμα {self.step_data['number']}ο, {step_data["title"]}", font=("Arial", 16), anchor="w")
+        self.title_label.pack(fill="x")
 
-        self.description = tk.Label(self, text=self.step_data["description"], font=("Arial", 12), border=0, relief="solid", padx=10, pady=10)
+        self.time_label = tk.Label(self, text="\nO χρόνος που απαιτείται για την εκτέλεση αυτού του βήματος είναι: " , font=("Arial", 14), anchor="w")
+        self.time_label.pack(fill="x")
+
+        self.time_label_value = tk.Label(self, text=f"{self.time_format(int(step_data["execution_time"]))}", font=("Arial", 14, 'bold'), anchor="w")
+        self.time_label_value.pack(fill="x")
+
+        self.ingredients_label = tk.Label(self, text="\nΤα υλικά που θα χρειαστείτε είναι: ", font=("Arial", 14), anchor="w")
+        self.ingredients_label.pack(fill="x")
+        
+        self.ingredients_label_value = tk.Label(self, text=", ".join(self.ingredients), font=("Arial", 14, 'bold'), anchor="w")
+        self.ingredients_label_value.pack(fill="x")
+
+        self.directions_label = tk.Label(self, text="\nΟδηγίες: ", font=("Arial", 14), anchor="w")
+        self.directions_label.pack(fill="x")
+
+        self.description = tk.Label(self, text=self.step_data["description"], font=("Arial", 14), anchor="w")
         self.description.pack(fill="x")
+
+    def time_format(self, minutes):
+        hours = minutes // 60
+        minutes = minutes % 60
+        return f"{hours} ώρες και {minutes} λεπτά" if hours > 0 else f"{minutes} λεπτά"
 
 
 class Finish(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        self.label = tk.Label(self, text="Η συνταγή ολοκληρώθηκε!", font=("Arial", 24), border=0, relief="solid", padx=10, pady=10)
+        self.label = tk.Label(self, text="Η συνταγή ολοκληρώθηκε", font=("Arial", 18), border=0, relief="solid", padx=10, pady=10)
+        self.label.pack(fill="x")
+
+        self.label = tk.Label(self, text="Καλή όρεξη!", font=("Arial", 20), border=0, relief="solid", padx=10, pady=10)
         self.label.pack(fill="x")
 
 
@@ -75,10 +125,10 @@ class Execution(tk.Toplevel):
         self.next_button = tk.Button(self.head_frame, text="Επόμενο", command=self.next_step)
         self.next_button.grid(row=2, column=1, sticky="e", padx=10, pady=10)
 
-        self.mainframe = tk.Frame(self, borderwidth=1, relief='solid', padx=10, pady=10)
+        self.mainframe = tk.Frame(self, padx=10, pady=10)
         self.mainframe.pack(fill="both", expand=True)
 
-        Welcome(self, recipe_id).place(in_=self.mainframe, x=0, y=0, relwidth=1, relheight=1)
+        Welcome(self, self.recipe).place(in_=self.mainframe, x=0, y=0, relwidth=1, relheight=1)
 
     def update_progress(self):
         total_time = self.recipe["execution_time"]
@@ -102,7 +152,7 @@ class Execution(tk.Toplevel):
             self.previous_button["state"] = "normal"
             self.next_button["state"] = "normal"
         else:
-            Welcome(self, self.recipe_id).place(in_=self.mainframe, x=0, y=0, relwidth=1, relheight=1)
+            Welcome(self, self.recipe).place(in_=self.mainframe, x=0, y=0, relwidth=1, relheight=1)
             self.previous_button["state"] = "disabled"
             self.next_button["state"] = "normal"
         
