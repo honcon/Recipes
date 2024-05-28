@@ -246,6 +246,14 @@ def edit_delete(recipe_id, action, updated_data=None, step_id=None, step_data=No
         return {"success": False, "message": f"Error: {e}"}
 
 
+def get_categories():
+    categories = list(RecipeCategory.select())
+    return {category.id: category.name for category in categories}
+
+def get_ingredients():
+    ingredients = list(Ingredient.select())
+    return {ingredient.id: ingredient.name for ingredient in ingredients}
+
 def execute_recipe(recipe_id):
     try:
         recipe = Recipe.get_by_id(recipe_id)

@@ -1,5 +1,5 @@
 import tkinter as tk
-from backend import db, utilities
+from backend import utilities
 from tkinter import messagebox, ttk
 from tkscrolledframe import ScrolledFrame
 from pprint import pprint
@@ -195,8 +195,8 @@ class AddEditRecipe(tk.Toplevel):
         self.edit_mode = recipe_id and recipe_id > 0
         self.parent = parent
 
-        self.categories = self.get_categories()
-        self.ingredients_list = self.get_ingredients()
+        self.categories = list(utilities.get_categories().values())
+        self.ingredients_list = utilities.get_ingredients()
 
 
         self.name = tk.StringVar()
@@ -303,10 +303,6 @@ class AddEditRecipe(tk.Toplevel):
             total_time += step.execution_time.get()
         self.execution_time.set(total_time)
 
-    def get_categories(self):
-        categories = list(db.RecipeCategory.select())
-        return [category.name for category in categories]
-
     def save(self):
         recipe_data = {
             "name": self.name.get(),
@@ -382,12 +378,6 @@ class AddEditRecipe(tk.Toplevel):
         self.recipe_time.delete(0, tk.END)
         self.recipe_time.insert(0, self.time_format(self.execution_time.get()))
         self.recipe_time.configure(state='readonly')
-
-    def get_ingredients(self):
-        ingredients = list(db.Ingredient.select())
-        # return [(ingredient.id, ingredient.name) for ingredient in ingredients]
-        # return a dictionary with the id as the key and the name as the value
-        return {ingredient.id: ingredient.name for ingredient in ingredients}
 
     def validate_recipe(self, recipe_data):
         if not recipe_data["name"] or recipe_data["name"].strip() == "":
