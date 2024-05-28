@@ -335,7 +335,8 @@ class AddEditRecipe(tk.Toplevel):
             response = utilities.add_full_recipe(recipe_data)
         
         if response["success"]:
-            self.parent.load_recipes()
+            self.parent.load_categories()
+            self.parent.search_recipes()
             self.destroy()
             messagebox.showinfo("Αποθήκευση", f"Η συνταγή {self.edit_mode and "ενημερώθηκε" or "προστέθηκε"} επιτυχώς", parent=self.parent)
 

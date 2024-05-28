@@ -162,12 +162,13 @@ def update_recipe(recipe_id, updated_data):
 # add_full_recipe(recipe_dt)
 
 
-def search_recipe(name=None, category=None):
+def search_recipe(search_term=None, category=None):
     try:
+
         query = Recipe.select()
 
-        if name:
-            query = query.where(Recipe.name.contains(name))
+        if search_term:
+            query = query.where(Recipe.name.contains(search_term))
 
         if category:
             query = query.join(RecipeCategory).where(RecipeCategory.name.contains(category))
@@ -175,9 +176,7 @@ def search_recipe(name=None, category=None):
         recipes = list(query)
 
         if recipes:
-            return {"success": True, "recipes": [{"id": recipe.id, "name": recipe.name, "category":
-                    recipe.category.name, "difficulty": recipe.difficulty, "execution_time": recipe.execution_time}
-                    for recipe in recipes]}
+            return {"success": True, "recipes": recipes}
 
         else:
             return {"success": False, "message": "No recipes found."}

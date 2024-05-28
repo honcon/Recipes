@@ -1,21 +1,31 @@
 import tkinter as tk
-from backend import db, utilities
+from backend import utilities
 from tkinter import ttk, simpledialog, messagebox
 from add_edit_recipe import AddEditRecipe
 from execution import Execution
 
 class Recipes(tk.Frame):
 
-    def load_recipes(self, search_term=None):
-        if search_term:
-            recipes = list(db.Recipe.select().where(db.Recipe.name.contains(search_term)))
+    def load_recipes(self, search_term=None, category=None):
+
+        response = utilities.search_recipe(search_term=search_term, category=category)
+
+        if response["success"]:
+            recipes = response["recipes"]
         else:
-            recipes = list(db.Recipe.select())
+            recipes = []
 
         self.recipes_table.delete(*self.recipes_table.get_children())
 
         for recipe in recipes:
             self.recipes_table.insert("", "end", values=(recipe.id, recipe.name))
+
+
+    def load_categories(self):
+        categories = list(utilities.get_categories().values())
+
+        self.categories = ["Όλες οι κατηγορίες"] + categories
+        self.category_select["values"] = self.categories
 
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
@@ -25,6 +35,7 @@ class Recipes(tk.Frame):
 
         self.search_var = tk.StringVar()
         self.search_var.trace_add("write", self.search_recipes)
+        self.categories = []
 
         self.heading = tk.Frame(self)
         self.heading.columnconfigure(0, weight=1)
@@ -54,6 +65,9 @@ class Recipes(tk.Frame):
         self.search_entry = tk.Entry(self.heading, textvariable=self.search_var)
         self.search_entry.grid(row=1, column=1, sticky="e")
 
+        self.category_select = ttk.Combobox(self.heading, state="readonly")
+        self.category_select.grid(row=2, column=0, columnspan=2, sticky="e")
+        self.category_select.bind("<<ComboboxSelected>>", lambda e: self.search_recipes())
 
         self.heading.pack(fill="x")
 
@@ -64,8 +78,10 @@ class Recipes(tk.Frame):
         self.recipes_table.pack(fill="both", expand=True)
         self.recipes_table.bind("<<TreeviewSelect>>", self.select_recipe)
 
-        self.load_recipes()
+        self.load_categories()
+        self.category_select.current(0)
 
+        self.load_recipes()
 
     def select_recipe(self, event):
         try:
@@ -81,13 +97,16 @@ class Recipes(tk.Frame):
             self.execute_recipe_button.config(state="disabled")
 
 
-    def search_recipes(self, var, index, mode):
+    def search_recipes(self, *args):
+        category_term = self.category_select.current() > 0 and self.categories[self.category_select.current()] or None
+        category_name = self.categories[self.category_select.current()]
+
         if (self.search_var.get() == ""):
-            self.recipes_table.heading("name", text="Συνταγή")
-            self.load_recipes()
+            self.recipes_table.heading("name", text=f"Συνταγή {category_term and f'({category_name})' or ''}")
+            self.load_recipes(category=category_term)
         else:
-            self.recipes_table.heading("name", text="Αναζήτηση για {}".format(self.search_var.get()))
-            self.load_recipes(self.search_var.get())
+            self.recipes_table.heading("name", text=f"Αναζήτηση για {self.search_var.get()} {category_term and f'σε ({category_name})' or ''}")
+            self.load_recipes(self.search_var.get(), category_term)
 
     def open_add_edit_recipe(self, recipe_id=None):
 
