@@ -2,6 +2,7 @@ import tkinter as tk
 from backend import utilities
 from tkinter import messagebox, ttk
 
+
 class Welcome(tk.Frame):
     def __init__(self, parent, recipe, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -14,7 +15,7 @@ class Welcome(tk.Frame):
             for ingredient in steps["ingredients"]:
                 self.ingredients.append(ingredient["name"])
 
-        self.time_label = tk.Label(self, text="O χρόνος που απαιτείται για την εκτέλεση της συνταγής είναι: " , font=("Arial", 14), anchor="w")
+        self.time_label = tk.Label(self, text="O χρόνος που απαιτείται για την εκτέλεση της συνταγής είναι: ", font=("Arial", 14), anchor="w")
         self.time_label.pack(fill="x")
 
         self.time_label_value = tk.Label(self, text=f"{self.time_format(int(recipe["execution_time"]))}", font=("Arial", 14, 'bold'), anchor="w")
@@ -26,11 +27,11 @@ class Welcome(tk.Frame):
         self.ingredients_label_value = tk.Label(self, text=", ".join(self.ingredients), font=("Arial", 14, 'bold'), anchor="w")
         self.ingredients_label_value.pack(fill="x")
 
-
     def time_format(self, minutes):
         hours = minutes // 60
         minutes = minutes % 60
         return f"{hours} ώρες και {minutes} λεπτά" if hours > 0 else f"{minutes} λεπτά"
+
 
 class Step(tk.Frame):
     def __init__(self, parent, step_data, *args, **kwargs):
@@ -43,7 +44,7 @@ class Step(tk.Frame):
         self.title_label = tk.Label(self, text=f"Βήμα {self.step_data['number']}ο, {step_data["title"]}", font=("Arial", 16), anchor="w")
         self.title_label.pack(fill="x")
 
-        self.time_label = tk.Label(self, text="\nO χρόνος που απαιτείται για την εκτέλεση αυτού του βήματος είναι: " , font=("Arial", 14), anchor="w")
+        self.time_label = tk.Label(self, text="\nO χρόνος που απαιτείται για την εκτέλεση αυτού του βήματος είναι: ", font=("Arial", 14), anchor="w")
         self.time_label.pack(fill="x")
 
         self.time_label_value = tk.Label(self, text=f"{self.time_format(int(step_data["execution_time"]))}", font=("Arial", 14, 'bold'), anchor="w")
@@ -98,7 +99,7 @@ class Execution(tk.Toplevel):
             return
 
         self.head_frame = tk.Frame(self)
-        self.head_frame.columnconfigure(0, weight=1 )
+        self.head_frame.columnconfigure(0, weight=1)
         self.head_frame.pack(fill="x")
 
         self.label = tk.Label(self.head_frame, text=f"Εκτέλεση συνταγής {self.recipe["name"]}", font=("Arial", 24), border=0, relief="solid", padx=10, pady=10, borderwidth=0)
@@ -117,7 +118,6 @@ class Execution(tk.Toplevel):
 
         self.progressbar = ttk.Progressbar(self.head_frame, orient="horizontal", length=200, mode="determinate", variable=self.progress, maximum=100)
         self.progressbar.grid(row=1, column=0, columnspan=2, sticky="we", padx=10)
-
 
         self.previous_button = tk.Button(self.head_frame, text="Προηγούμενο", command=self.previous_step, state="disabled")
         self.previous_button.grid(row=2, column=0, sticky="w", padx=10, pady=10)

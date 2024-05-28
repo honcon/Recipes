@@ -2,8 +2,8 @@ import tkinter as tk
 from backend import utilities
 from tkinter import ttk, simpledialog, messagebox
 
+
 class Ingredients(tk.Frame):
-    
 
     def load_ingredients(self):
         ingredients = utilities.get_ingredients()
@@ -12,7 +12,6 @@ class Ingredients(tk.Frame):
         
         for ingredient_id, ingredient_name in ingredients.items():
             self.ingredients_table.insert("", "end", values=(ingredient_id, ingredient_name))
-
 
     def __init__(self, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
@@ -43,7 +42,6 @@ class Ingredients(tk.Frame):
 
         self.load_ingredients()
 
-
     def select_ingredient(self, event):
         try:
             item = self.ingredients_table.selection()[0]
@@ -52,7 +50,6 @@ class Ingredients(tk.Frame):
         except IndexError:
             self.selected_ingredient.set(0)
             self.delete_ingredient_button.config(state="disabled")
-
 
     def add_ingredient(self):
         new_ingredient = simpledialog.askstring("Προσθήκη Υλικού", "Όνομα Υλικού", parent=self)

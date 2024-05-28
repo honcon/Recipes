@@ -2,8 +2,8 @@ import tkinter as tk
 from backend import utilities
 from tkinter import messagebox, ttk
 from tkscrolledframe import ScrolledFrame
-from pprint import pprint
 # https://pythonassets.com/posts/drop-down-list-combobox-in-tk-tkinter/
+
 
 class StepFrame(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -34,7 +34,6 @@ class StepFrame(tk.Frame):
         head_frame.pack(fill="x", expand=True)
         separator = ttk.Separator(self, orient="horizontal") 
         separator.pack(fill="x", padx=10)
-        
 
     # Title
 
@@ -56,7 +55,6 @@ class StepFrame(tk.Frame):
         time_label = tk.Label(time_frame, text="Χρόνος Εκτέλεσης", font=("Helvetica", 12, "bold"), width=20, anchor="e")
         time_label.grid(row=0, column=0, sticky="w")
 
-
         self.time_entry_hours = tk.Entry(time_frame, width=3)
         self.time_entry_hours.grid(row=0, column=1, sticky="w")
         self.time_entry_hours.bind("<KeyRelease>", self.on_update_hours)
@@ -73,7 +71,6 @@ class StepFrame(tk.Frame):
 
         time_frame.pack(fill="x", expand=True)
 
-
     # Ingredients
 
         ingredients_frame = tk.Frame(self, padx=10, pady=10)
@@ -89,7 +86,6 @@ class StepFrame(tk.Frame):
         self.ingredient_list = ttk.Combobox(ingredients_top_bar, state="readonly", values=list(self.ingredients_list.values()))
         self.ingredient_list.bind("<<ComboboxSelected>>", self.on_change_ingredient_from_list)
         self.ingredient_list.grid(row=0, column=0, sticky="w")
-
 
         self.add_ingredient_button = tk.Button(ingredients_top_bar, text="Προσθήκη", command=self.add_ingredient)
         self.add_ingredient_button.grid(row=0, column=1, sticky="w")
@@ -156,7 +152,6 @@ class StepFrame(tk.Frame):
         if selection:
             self.ingredients_table.delete(selection)
 
-
     def on_update_hours(self, e):
         value = self.time_entry_hours.get()
 
@@ -164,7 +159,6 @@ class StepFrame(tk.Frame):
             self.time_entry_hours.delete(0, tk.END)
 
         self.update_time()
-
 
     def on_update_minutes(self, e):
         value = self.time_entry_minutes.get()
@@ -186,6 +180,7 @@ class StepFrame(tk.Frame):
         total_minutes = int(self.time_entry_hours.get() or 0) * 60 + int(self.time_entry_minutes.get() or 0)
         self.execution_time.set(total_minutes)
 
+
 class AddEditRecipe(tk.Toplevel):
 
     def __init__(self, parent, recipe_id, *args, **kwargs):
@@ -198,10 +193,9 @@ class AddEditRecipe(tk.Toplevel):
         self.categories = list(utilities.get_categories().values())
         self.ingredients_list = utilities.get_ingredients()
 
-
         self.name = tk.StringVar()
         self.execution_time = tk.IntVar()
-        self.difficulty = tk.IntVar() # 1: easy, 2: medium, 3: hard
+        self.difficulty = tk.IntVar()  # 1: easy, 2: medium, 3: hard
         self.category = tk.StringVar()
 
         self.execution_time.trace_add("write", lambda *args: self.update_time())
@@ -233,7 +227,6 @@ class AddEditRecipe(tk.Toplevel):
         left_frame.pack(side="left", fill="y", expand=False)
         main_frame.pack(fill="both", side="left", expand=True)
 
-
     # Basic Recipe Information
 
         self.recipe_name_label = tk.Label(left_frame, text="Όνομα Συνταγής", anchor="w", font=("Helvetica", 13, "bold"))
@@ -255,10 +248,8 @@ class AddEditRecipe(tk.Toplevel):
         self.recipe_difficulty.bind("<<ComboboxSelected>>", lambda e: self.difficulty.set(self.recipe_difficulty.current() + 1))
         self.recipe_difficulty.pack(fill="x")
 
-
         self.recipe_time_label = tk.Label(left_frame, text="Χρόνος Προετοιμασίας", anchor="w", font=("Helvetica", 13, "bold"))
         self.recipe_time_label.pack(fill="x")
-
 
         self.recipe_time = tk.Entry(left_frame, state="readonly")
         self.recipe_time.pack(fill="x")
@@ -268,7 +259,6 @@ class AddEditRecipe(tk.Toplevel):
         self.add_step_button = tk.Button(main_frame, text="Προσθήκη Βήματος", command=self.add_step)
         self.add_step_button.pack()
 
-
         self.scrolled_frame = ScrolledFrame(main_frame)
         self.scrolled_frame.pack(fill="both", expand=True)
         self.steps_frame = self.scrolled_frame.display_widget(tk.Frame, fit_width=True)
@@ -277,7 +267,6 @@ class AddEditRecipe(tk.Toplevel):
 
         if self.edit_mode:
             self.load_recipe(recipe_id)
-
 
     def load_recipe(self, recipe_id):
         recipe_data = utilities.get_full_recipe(recipe_id)
@@ -343,7 +332,6 @@ class AddEditRecipe(tk.Toplevel):
         else:
             messagebox.showinfo("Αποθήκευση", f"Σφάλμα {response["message"]}", parent=self)
 
-
     def order_steps(self):
         for i, step in enumerate(self.steps):
             step.step_number.set(i + 1)
@@ -361,7 +349,6 @@ class AddEditRecipe(tk.Toplevel):
 
         self.steps.append(step)
         self.order_steps()
-
 
     def delete_step(self, step):
         self.steps.remove(step)

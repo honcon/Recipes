@@ -2,12 +2,12 @@
 
 import tkinter as tk
 
-from tkinter import messagebox
 from ingredients import Ingredients
 from recipes import Recipes
 
+
 class App(tk.Tk):
-    menu_type = { "recipes": 0, "ingredients": 1 }
+    menu_type = {"recipes": 0, "ingredients": 1}
     selected_menu = None
 
     def __init__(self):
@@ -49,7 +49,6 @@ class App(tk.Tk):
             self.recipes.lift()
         if self.selected_menu == self.menu_type["ingredients"]:
             self.ingredients.lift()
-
 
 
 if __name__ == '__main__':

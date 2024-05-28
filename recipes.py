@@ -1,8 +1,9 @@
 import tkinter as tk
 from backend import utilities
-from tkinter import ttk, simpledialog, messagebox
+from tkinter import ttk, messagebox
 from add_edit_recipe import AddEditRecipe
 from execution import Execution
+
 
 class Recipes(tk.Frame):
 
@@ -19,7 +20,6 @@ class Recipes(tk.Frame):
 
         for recipe in recipes:
             self.recipes_table.insert("", "end", values=(recipe.id, recipe.name))
-
 
     def load_categories(self):
         categories = list(utilities.get_categories().values())
@@ -96,12 +96,11 @@ class Recipes(tk.Frame):
             self.edit_recipe_button.config(state="disabled")
             self.execute_recipe_button.config(state="disabled")
 
-
     def search_recipes(self, *args):
         category_term = self.category_select.current() > 0 and self.categories[self.category_select.current()] or None
         category_name = self.categories[self.category_select.current()]
 
-        if (self.search_var.get() == ""):
+        if self.search_var.get() == "":
             self.recipes_table.heading("name", text=f"Συνταγή {category_term and f'({category_name})' or ''}")
             self.load_recipes(category=category_term)
         else:
@@ -122,7 +121,6 @@ class Recipes(tk.Frame):
         add_recipe.transient(self)
         add_recipe.grab_set()
         self.wait_window(add_recipe)
-
 
     def execute_recipe(self, recipe_id):
         execution = Execution(self, recipe_id=recipe_id)
@@ -150,7 +148,6 @@ class Recipes(tk.Frame):
                 self.load_recipes()
             else:
                 messagebox.showerror("Σφάλμα", response["message"], parent=self)
-
 
     def edit_recipe(self):
         self.open_add_edit_recipe(recipe_id=self.selected_recipe.get())
