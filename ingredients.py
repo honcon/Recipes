@@ -1,17 +1,17 @@
 import tkinter as tk
-from backend import db as db
-from tkinter import ttk, simpledialog
+from backend import utilities
+from tkinter import ttk, simpledialog, messagebox
 
 class Ingredients(tk.Frame):
     
 
     def load_ingredients(self):
-        ingredients = list(db.Ingredient.select())
+        ingredients = utilities.get_ingredients()
         # clear the table and fill it with the new data
         self.ingredients_table.delete(*self.ingredients_table.get_children())
         
-        for ingredient in ingredients:
-            self.ingredients_table.insert("", "end", values=(ingredient.id, ingredient.name))
+        for ingredient_id, ingredient_name in ingredients.items():
+            self.ingredients_table.insert("", "end", values=(ingredient_id, ingredient_name))
 
 
     def __init__(self, *args, **kwargs):
@@ -59,11 +59,18 @@ class Ingredients(tk.Frame):
 
         # new ingredient is not None or empty string
         if new_ingredient:
-            db.Ingredient.create(name=new_ingredient)
-            self.load_ingredients()
+            response = utilities.add_ingredient(new_ingredient)
 
+            if response["success"]:
+                self.load_ingredients()
+            else:
+                messagebox.showerror("Σφάλμα", response["message"])
 
     def delete_ingredient(self):
         if self.selected_ingredient:
-            db.Ingredient.delete().where(db.Ingredient.id == self.selected_ingredient.get()).execute()
-            self.load_ingredients()
+            response = utilities.delete_ingredient(self.selected_ingredient.get())
+
+            if response["success"]:
+                self.load_ingredients()
+            else:
+                messagebox.showerror("Σφάλμα", response["message"])

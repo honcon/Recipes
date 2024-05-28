@@ -254,6 +254,28 @@ def get_ingredients():
     ingredients = list(Ingredient.select())
     return {ingredient.id: ingredient.name for ingredient in ingredients}
 
+def delete_ingredient(ingredient_id):
+    try:
+        Ingredient.delete().where(Ingredient.id == ingredient_id).execute()
+        return {"success": True, "message": "Ingredient deleted successfully."}
+
+    except Ingredient.DoesNotExist:
+        return {"success": False, "message": "Ingredient does not exist."}
+
+    except Exception as e:
+        return {"success": False, "message": f"Error: {e}"}
+
+def add_ingredient(ingredient_name):
+    try:
+        ingredient = Ingredient.create(name=ingredient_name)
+        return {"success": True, "message": "Ingredient added successfully.", "ingredient_id": ingredient.id}
+
+    except IntegrityError as e:
+        return {"success": False, "message": f"Database error: {e}"}
+
+    except Exception as e:
+        return {"success": False, "message": f"Error: {e}"}
+
 def execute_recipe(recipe_id):
     try:
         recipe = Recipe.get_by_id(recipe_id)
