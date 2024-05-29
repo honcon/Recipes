@@ -72,8 +72,7 @@ def get_full_recipe(recipe_id):
             for ingredient in ingredients:
                 step_data["ingredients"].append({
                     "id": ingredient.ingredient_id.id,
-                    "name": ingredient.ingredient_id.name,
-                    "quantity": ingredient.quantity
+                    "name": ingredient.ingredient_id.name
                 })
 
             recipe_data["steps"].append(step_data)
