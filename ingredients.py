@@ -61,7 +61,7 @@ class Ingredients(tk.Frame):
             if response["success"]:
                 self.load_ingredients()
             else:
-                messagebox.showerror("Σφάλμα", response["message"])
+                messagebox.showerror("Σφάλμα", response["message"], parent=self)
 
     def delete_ingredient(self):
         if self.selected_ingredient:

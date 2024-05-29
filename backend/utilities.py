@@ -188,8 +188,11 @@ def delete_ingredient(ingredient_id):
 
 def add_ingredient(ingredient_name):
     try:
-        ingredient = Ingredient.create(name=ingredient_name)
-        return {"success": True, "message": "Ingredient added successfully.", "ingredient_id": ingredient.id}
+        ingredient, created = Ingredient.get_or_create(name=ingredient_name)
+        if created:
+            return {"success": True, "message": "Ingredient added successfully.", "ingredient_id": ingredient.id}
+        else:
+            return {"success": False, "message": "Το υλικό υπάρχει ήδη."}
 
     except IntegrityError as e:
         return {"success": False, "message": f"Database error: {e}"}
