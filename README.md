@@ -13,6 +13,8 @@ Steps to Run the Application
     Download the Application:
         Download the executable file named Recipes.exe to your preferred folder.
 
+        Download from: https://github.com/honcon/Recipes/blob/main/dist/Recipes.exe
+
     Run the Application:
         Locate the Recipes.exe file in your chosen folder.
         Double-click the icon, or right-click the icon and select "Open", or select the icon and press "Enter" on the keyboard.
